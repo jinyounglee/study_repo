@@ -10,12 +10,22 @@ var member = {
 	list : [],
 	currentData : {},
 
+	createModal : function(){
+		if(!this.currentData.idx){
+			this.reset();
+			this.currentData.joinDate = this.dateFormat();
+		}
+		this.reset();
+		$('#memberModal').modal();
+	},
+
+
 	showModal : function(){
 		if(!this.currentData.idx){
 			this.reset();
 			this.currentData.joinDate = this.dateFormat();
 		}
-
+		
 		$('#memberModal').modal();
 	},
 
@@ -57,6 +67,10 @@ var member = {
 		});*/
 		this.$el.find('#btnClose').click(function(){
 			this.closeModal();
+		});
+
+		this.$el.find('#btnAdd').click(function(){
+			member.createModal();
 		});
 	},
 
@@ -141,7 +155,6 @@ var member = {
 				return false;
 			}
 		});
-
 		return res;
 	},
 	
