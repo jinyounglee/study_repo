@@ -41,8 +41,23 @@ var member = {
 			member.showModal();
 		});
 
-		this.$el.find('#btnSubmit').click(this.save());
-		this.$el.find('#btnClose').click(this.closeModal());
+		//this.$el.find('#btnSubmit').click(this.save()); // 무한로딩 
+		this.$el.find('#btnSubmit').click(function(){
+			member.save();
+		}); // 정상 작동 
+		/*
+			1. this.save()는 즉시 실행 init함수 안에서 
+			2. this.$el.find('#btnSubmit').click(function(){
+			this.save(); 실행 잘된다. 
+
+		});
+		*/
+		/*this.$el.find('#btnSubmit').click(function(){
+			this.save();
+		});*/
+		this.$el.find('#btnClose').click(function(){
+			this.closeModal();
+		});
 	},
 
 	generateMembers : function(){
@@ -94,7 +109,12 @@ var member = {
 
 	makeTbody : function(members){
 		var $table = $('#tMember'),
+			$oldTbody = $table.find('tbody'),
 			$tbody = $(document.createElement('tbody'));
+
+		if($oldTbody){
+			$oldTbody.remove();
+		}
 
 		$.each(members, function(index, member){
 			var $tr = $(document.createElement('tr'));
@@ -152,8 +172,22 @@ var member = {
 		member.job = $inputJob.val();
 		member.updateDate = this.dateFormat();
 
-		this.list.push(member);
+		this.send(member);
 		//this.init();
+	},
+
+	send : function(member){
+		this.list[member.idx-1] = member;
+		this.init();
+		this.closeModal();
+	},
+	dateForrmat : function(){
+		var date = date || new Date(),
+			year = date.getFullYear(),
+			month = date.getMonth(),
+			day = date.getDate();
+		month = (month < 10)? '0' + month : month;
+		day = (day < 10)? '0' + day : day;
 	},
 
 	generateIdx : function(){
@@ -165,5 +199,4 @@ var member = {
 		var date = date || new Date();
 		return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + (date.getDate());
 	}	
-
 }
