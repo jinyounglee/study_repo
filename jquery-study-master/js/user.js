@@ -47,6 +47,13 @@ var user = {
 		this.$el.find('#btnSubmit').click(function(){
 			user.signUp();
 		});
+		this.$el.find('#btnLogin').click(function(){
+			// 입력창에 입력된 email과 password를 검사해서 일치하면 로그인 처리 기능 구현
+			// 아니면 email & password 확인 alert
+			var obj = { email : $('#loginEmail').val() };
+			//var email = $('#loginEmail').val(); 
+			user.login(obj);
+		});
 	},
 	showModal : function(){
 		this.resetModal();
@@ -72,7 +79,22 @@ var user = {
 		name = this.$el.find('#inputName').val(),
 		job = this.$el.find('#inputJob').val();
 
-		this.find(email);	
+		this.find(email);
+
+
+		/*if(this.find(email)){
+			alert('이미 가입된 사용자입니다.');
+			return;
+		};	*/
+
+		this.save({
+			email : email,
+			password : password,
+			name : name,
+			job : job,
+			joinDate : currentTime,
+			updateDate : currentTime
+		});
 
 	// 입력창에 빈칸은 없는가?
 	// 빈칸이 있으면 해당 입력칸에 강조효과 (empty 클래스 추가 )주기
@@ -99,9 +121,9 @@ var user = {
 				$signForm.removeClass('empty');
 			}
 		});
-		return result;
+		return;
 	},
-/*
+
 	find : function(email){
 		for( var i=0; i< users.length; i++){
 			if( email == users[i].email ){
@@ -109,16 +131,30 @@ var user = {
 				return false;
 			}
 		}
-	}*/
+	},
 
-	find : function(email){
+/*	find : function(email){
 		$.each(users, function(index, value){
 			var userTemp = value;
 			if( userTemp.email === email ){
 				result = true;
-				return;
+				return false;
 			}	
 		});
-		return result;
+		// return false;
+	},
+*/
+	save : function( obj ){
+		users.push(obj);
+		alert('등록되었습니다.');
+	},
+
+	login : function(obj){
+		console.log( obj.email );
+		for( var i=0; i<users.length; i++){
+			if( obj.email == users[i].email){
+				alert('같은 이메일');
+			}
+		}		
 	}
 }
