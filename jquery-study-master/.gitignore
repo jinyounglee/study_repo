@@ -1,4 +1,4 @@
 /.idea
 sh.exe
 *.stackdump
-/bower_component
+/bower_components
