@@ -1,0 +1,19 @@
+{
+  "name": "study_repo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "js.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://jinyounglee@github.com/jinyounglee/study_repo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jinyounglee/study_repo/issues"
+  },
+  "homepage": "https://github.com/jinyounglee/study_repo#readme"
+}

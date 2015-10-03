@@ -124,14 +124,29 @@ var user = {
 		return;
 	},
 
-	find : function(email){
+
+	find : function(obj){
+		var result;
+		$.ajax({
+			method : 'POST',
+			url : 'email',
+			data : obj,
+			dataType : 'json',
+			success : function(data){
+				alert( data.status +'\n'+ data.message );
+				return data.status;
+			}
+		});
+	},
+
+	/*find : function(email){
 		for( var i=0; i< users.length; i++){
 			if( email == users[i].email ){
 				alert('중복된 사용자입니다.');
 				return false;
 			}
 		}
-	},
+	}*/
 
 /*	find : function(email){
 		$.each(users, function(index, value){

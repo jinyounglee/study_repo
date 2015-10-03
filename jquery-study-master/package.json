@@ -1,0 +1,16 @@
+{
+  "name": "jquery-study-master",
+  "version": "1.0.0",
+  "description": "- 이동욱(주최자)\r  - 이바우\r  - 김태영\r  - 전옥현\r  - 신윤아",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "express": "^4.13.3",
+    "path": "^0.12.7"
+  }
+}
