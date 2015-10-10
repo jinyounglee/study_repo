@@ -1,29 +1,14 @@
-// jquery는 캐시를 한다  ==  한번 물고 있으면 계속 물고있는다.
-// 
-// this.$el = $('.container')  // 해놓으면 
-// this.$el.find   호출 할때마다 물고있는 놈을 사용 한다.
-// 함수는 한가지 기능만 가질수 있도록 하는게 좋다 
-
-$(function(){
-	// js실행시 바로 실행될 영역
-	user.init();
-});
-
-// db연동시 사라짐
-var users = [];
+// DB 연동시 삭제될 부분
 var currentTime = new Date();
-// 굳이 변수에 담아서 메모리 할당 할 필요가 없다. 
-
-var users = [
-	{
+var users = [{
 		email : '1',
-		password : '2',
+		password : '1',
 		name : '1',
 		job : '1',
 		joinDate : currentTime,
 		updateDate : currentTime
-	},
-	{
+},
+{
 		email : '2',
 		password : '2',
 		name : '2',
@@ -32,79 +17,96 @@ var users = [
 		updateDate : currentTime
 }];
 
+$(function(){
+
+	//js 호출시 바로 시작될 영역
+	user.init();
+});
+
 
 var user = {
+
 	$el : {},
 
 	init : function(){
+		
+		//기본적인 이벤트 바인딩
+
 		this.$el = $('.container');
+
 		this.$el.find('#btnSignUp').click(function(){
 			user.showModal();
 		});
+
 		this.$el.find('#btnClose').click(function(){
 			user.closeModal();
 		});	
+
 		this.$el.find('#btnSubmit').click(function(){
 			user.signUp();
 		});
+
 		this.$el.find('#btnLogin').click(function(){
-			// 입력창에 입력된 email과 password를 검사해서 일치하면 로그인 처리 기능 구현
-			// 아니면 email & password 확인 alert
-			var obj = { email : $('#loginEmail').val() };
-			//var email = $('#loginEmail').val(); 
-			user.login(obj);
-		});
+			user.login();
+		});	
+
 	},
+
 	showModal : function(){
 		this.resetModal();
 		this.$el.find('#userModal').modal();
-		//this.$el.find('input').val('');
 	},
+	
 	closeModal : function(){
-		this.$el.find('#userModal').modal('hide');		
+		this.$el.find('#userModal').modal('hide');
 	},
+
 	resetModal : function(){
 		this.$el.find('.signForms').val('');
 	},
-	addClass : function(){
-		this.$el.find('#memberModal input').addClass( "empty" );
-	},
-	removeClass : function(){
-		this.$el.find('#memberModal input').removeClass("class", "empty");
-	},
+
 	signUp : function(){
 		var email = this.$el.find('#inputEmail').val(),
-		password = this.$el.find('#inputPassword').val(),
-		passwordConfirm = this.$el.find('#passwordConfirm').val(),
-		name = this.$el.find('#inputName').val(),
-		job = this.$el.find('#inputJob').val();
+			password = this.$el.find('#inputPassword').val(),
+			passwordConfirm = this.$el.find('#inputPasswordConfirm').val(),
+			name = this.$el.find('#inputName').val(),
+			job = this.$el.find('#inputJob').val();
+		
+		var currentTime = new Date();
 
-		this.find(email);
-
-
-		/*if(this.find(email)){
+		// 1. 입력창에서 빈칸은 없는가?
+		if(!this.validate()){
+			alert('필수값을 모두 채워주세요');
+			return;
+		}
+		
+		// 2. password와 passwordConfirm이 같은가?
+        if(password !== passwordConfirm){
+            alert('패스워드가 일치하지 않습니다.');
+            return;
+        }
+	
+		// 3. 이미 등록된 사용자가 아닌가?
+		if(this.find({
+						email : email,
+						password : password,
+						name : name,
+						job : job,
+						joinDate : currentTime,
+						updateDate : currentTime
+			})){
 			alert('이미 가입된 사용자입니다.');
 			return;
-		};	*/
+		}
 
 		this.save({
-			email : email,
-			password : password,
-			name : name,
-			job : job,
-			joinDate : currentTime,
-			updateDate : currentTime
+				email : email,
+				password : password,
+				name : name,
+				job : job,
+				joinDate : currentTime,
+				updateDate : currentTime
 		});
-
-	// 입력창에 빈칸은 없는가?
-	// 빈칸이 있으면 해당 입력칸에 강조효과 (empty 클래스 추가 )주기
-	// 저장 실패 alert
-	// 2. password 와 passwordConfirm이 같은가? 다르면 패스워드 확인 all
-	// 3. 이미 등록되 사용자가 아닌가?
-	// find 함수를 만들고 email이 중복인지 체크해서 
-	// 4. 위 검증이 끝나면 회원 가입 
-
-
 	},
 
 	validate : function(){
@@ -121,40 +123,83 @@ var user = {
 				$signForm.removeClass('empty');
 			}
 		});
-		return;
+
+		return result;
 	},
 
-	find : function(email){
-		for( var i=0; i< users.length; i++){
-			if( email == users[i].email ){
-				alert('중복된 사용자입니다.');
-				return false;
-			}
-		}
-	},
+	//DB 연동시 수정
+	find : function(obj){
+		var result;
+		var _ = this;
 
-/*	find : function(email){
-		$.each(users, function(index, value){
-			var userTemp = value;
-			if( userTemp.email === email ){
-				result = true;
-				return false;
-			}	
+		$.ajax({
+			method: 'POST',
+			url: 'email',
+			data: obj,
+			dataType: 'json',
+			success : function(data){    // 서버와 통신이 성공했을때 
+                    alert(data.status);
+                    if( !data.status ){
+
+                         _.save(obj);
+                         _.closeModal();
+                    } else {
+                         alert('이미 가입된 사용자입니다. ');
+                    }
+               }
 		});
-		// return false;
+	},
+
+	//DB 연동시 수정
+/*	save : function(obj){
+
+		users.push(obj);
+		
+		alert('등록 되었습니다.');
+
+		this.closeModal();
 	},
 */
-	save : function( obj ){
-		users.push(obj);
-		alert('등록되었습니다.');
-	},
+	save : function(obj){
+		var _ = this;
 
-	login : function(obj){
-		console.log( obj.email );
-		for( var i=0; i<users.length; i++){
-			if( obj.email == users[i].email){
-				alert('같은 이메일');
+		$.ajax({
+			method : "POST",
+			url : "user",
+			data : obj,
+			dataType : "json",
+			success : function(data){
+                if( data.status ){
+                	alert('등록되었습니다. ');
+                     _.closeModal();
+                } else {
+                     alert('이미 가입된 사용자입니다. ');
+                }
 			}
-		}		
+		});
+
+	},	
+
+	login : function(){
+		var email = this.$el.find('#loginEmail').val(),
+			password = this.$el.find('#loginPassword').val();
+		var loginCheck = { "email" : email , "password" : password };
+		
+		$.ajax({
+			method : "POST",
+			url : "login",
+			data : loginCheck,
+			dataType : "json",
+			success : function(data){
+				alert("로그인 성공 !!!!" );
+			}
+		});	
+
+		/*
+			1. ajax로 email과 password 전송 
+			2. 해당 회원이 존재하고 password 같으면 alert으로 로그인 성공
+				-- 없으면 
+
+		 */
 	}
 }

@@ -1,6 +1,6 @@
 
 $(function(){
-	//QA테스트 진행
+
 	member.init();
 
 });
@@ -10,10 +10,9 @@ var member = {
 	list : [],
 	currentData : {},
 
-	showModal : function(){
-		if(!this.currentData.idx){
+	showModal : function(isEdit){
+		if(!isEdit){
 			this.reset();
-			this.currentData.joinDate = this.dateFormat();
 		}
 
 		$('#memberModal').modal();
@@ -31,6 +30,7 @@ var member = {
 	},
 
 	init : function(){
+		var that = this;
 		this.list = (this.list.length > 0)? this.list : this.generateMembers();
 		this.makeTbody(this.list);
 		this.$el = $('#memberMain');
@@ -38,26 +38,20 @@ var member = {
 		this.$el.on('click', '.member_info', function(){
 			var idx = $(this).attr('id').slice(7);
 			member.edit(member.find(idx));
-			member.showModal();
+			member.showModal(true);
 		});
 
-		//this.$el.find('#btnSubmit').click(this.save()); // 무한로딩 
 		this.$el.find('#btnSubmit').click(function(){
 			member.save();
-		}); // 정상 작동 
-		/*
-			1. this.save()는 즉시 실행 init함수 안에서 
-			2. this.$el.find('#btnSubmit').click(function(){
-			this.save(); 실행 잘된다. 
+		});
 
-		});
-		*/
-		/*this.$el.find('#btnSubmit').click(function(){
-			this.save();
-		});*/
 		this.$el.find('#btnClose').click(function(){
-			this.closeModal();
+			member.closeModal();
 		});
+
+		this.$el.find('#btnAdd').click(function(){
+			member.showModal();
+		});		
 	},
 
 	generateMembers : function(){
@@ -128,6 +122,7 @@ var member = {
 			}
 			$tbody.append($tr);
 		});
+
 		$table.append($tbody);
 	},
 
@@ -163,17 +158,20 @@ var member = {
 			$inputName = $('#inputName'),
 			$inputJob = $('#inputJob');
 
+		var currentDate = this.dateFormat();
+
 		if(!member.idx){
+			member = this.generateMember();
 			member.idx = this.generateIdx();
+			member.joinDate = currentDate;
 		}
 
 		member.email = $inputEmail.val();
 		member.name = $inputName.val();
 		member.job = $inputJob.val();
-		member.updateDate = this.dateFormat();
+		member.updateDate = currentDate;
 
 		this.send(member);
-		//this.init();
 	},
 
 	send : function(member){
@@ -181,22 +179,35 @@ var member = {
 		this.init();
 		this.closeModal();
 	},
-	dateForrmat : function(){
-		var date = date || new Date(),
-			year = date.getFullYear(),
-			month = date.getMonth(),
-			day = date.getDate();
-		month = (month < 10)? '0' + month : month;
-		day = (day < 10)? '0' + day : day;
-	},
 
 	generateIdx : function(){
-		var lastIdx = this.list[this.list.length-1].idx;
+		var lastIndex = this.list.length-1,
+		 	lastIdx = this.list[lastIndex].idx;
+
 		return lastIdx+1;
 	},
 
+	generateMember : function(){
+		return {
+					idx : '',
+					email : '',
+					name : '',
+					job : '',
+					joinDate : '',
+					updateDate : ''
+		};
+	},
+
 	dateFormat : function(date){
-		var date = date || new Date();
-		return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + (date.getDate());
+		var date = date || new Date(),
+			year = date.getFullYear(),
+			month = date.getMonth()+1,
+			day = date.getDate();
+
+		month = (month.length < 2)? '0'+month : month;
+		day = (day.length < 2)? '0'+day : day;
+
+		return year + '-' + month + '-' + day;
 	}	
+
 }
